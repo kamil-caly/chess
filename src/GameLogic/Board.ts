@@ -1,5 +1,7 @@
 import type { PieceType, Player } from "../ChessTypes";
+import { Bishop } from "./Pieces/Bishop";
 import { Pawn } from "./Pieces/Pawn";
+import { Rook } from "./Pieces/Rook";
 import { Pos } from "./Pos";
 
 
@@ -51,6 +53,12 @@ export class Board {
         return this.blackPieces.includes(this.squares[pos.row][pos.col]);
     }
 
+    isOppositeColors(pos1: Pos, pos2: Pos): boolean {
+        if (this.isWhitePiece(pos1) && this.isBlackPiece(pos2)) return true;
+        if (this.isWhitePiece(pos2) && this.isBlackPiece(pos1)) return true;
+        return false;
+    }
+
     switchPlayer(): void {
         if (this.currentPlayer === 'white') this.currentPlayer = 'black'
         else this.currentPlayer = 'white'
@@ -62,7 +70,17 @@ export class Board {
         switch (this.getSquare(pos)){
             case 'P':
             case 'p':
-                moves = [...Pawn.getPossibleMoves(pos, this)];
+                moves = Pawn.getPossibleMoves(pos, this);
+                break;
+            case 'R':
+            case 'r':
+                moves = Rook.getPossibleMoves(pos, this);
+                break;
+            case 'B':
+            case 'b':
+                moves = Bishop.getPossibleMoves(pos, this);
+                break;
+            default:
                 break;
         }
 
