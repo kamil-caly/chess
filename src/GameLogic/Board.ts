@@ -40,13 +40,12 @@ export class Board {
     }
 
     setSquare(pos: Pos, piece: PieceType): void {
+        if (pos.row < 0 || pos.row > 7 || pos.col < 0 || pos.col > 7) return;
         this.squares[pos.row][pos.col] = piece;
     }
 
     isEmpty(pos: Pos): boolean {
-        return pos.row >= 0 && pos.row <= 7 
-            && pos.col >= 0 && pos.col <= 7 
-            && this.squares[pos.row][pos.col] === '';
+        return this.getSquare(pos) === '';
     }
 
     isWhitePiece(pos: Pos): boolean {
