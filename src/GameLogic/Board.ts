@@ -1,6 +1,7 @@
 import type { PieceType, Player } from "../ChessTypes";
 import { Bishop } from "./Pieces/Bishop";
 import { King } from "./Pieces/King";
+import { Knight } from "./Pieces/Knight";
 import { Pawn } from "./Pieces/Pawn";
 import { Queen } from "./Pieces/Queen";
 import { Rook } from "./Pieces/Rook";
@@ -92,6 +93,10 @@ export class Board {
             case 'K':
             case 'k':
                 moves = King.getPossibleMoves(pos, this);
+                break;
+            case 'N':
+            case 'n':
+                moves = Knight.getPossibleMoves(pos, this);
                 break;
             default:
                 break;
