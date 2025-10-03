@@ -34,6 +34,23 @@ export class Board {
         ];
     }
 
+    copy(): Board {
+        const copyBoard = new Board();
+        copyBoard.currentPlayer = this.currentPlayer;
+        copyBoard.clickedField = this.clickedField ? { ...this.clickedField } : undefined;
+        copyBoard.currentPossibleMoves = this.currentPossibleMoves.map(pos => ({ ...pos }));
+        copyBoard.squares = this.squares.map(row => [...row]);
+
+        return copyBoard;
+    }
+
+    makeMove(from: Pos, to: Pos): void {
+        const piece = this.getSquare(from);
+        if (piece === null) return;
+        this.setSquare(from, '');
+        this.setSquare(to, piece);
+    }
+
     getSquare(pos: Pos): PieceType | null {
         if (pos.row < 0 || pos.row > 7 || pos.col < 0 || pos.col > 7) return null;
         return this.squares[pos.row][pos.col];
@@ -64,15 +81,37 @@ export class Board {
         return false;
     }
 
+    isWhiteKing(pos: Pos): boolean {
+        const piece = this.getSquare(pos);
+        return piece === null ? false : piece === 'K';
+    }
+
+    isBlackKing(pos: Pos): boolean {
+        const piece = this.getSquare(pos);
+        return piece === null ? false : piece === 'k';
+    }
+
+    getBlackPiecePos(piece: PieceType): Pos[] {
+        const piecePos: Pos[] = [];
+        for (let r = 0; r <= 7; r++) {
+            for (let c = 0; c <= 7; c++) {
+                if (this.getSquare(new Pos(r, c)) === piece) piecePos.push(new Pos(r, c));
+            }
+        }
+
+        return piecePos;
+    }
+
     switchPlayer(): void {
         if (this.currentPlayer === 'white') this.currentPlayer = 'black'
         else this.currentPlayer = 'white'
     }
-    
+
     getPossibleMoves(pos: Pos): Pos[] {
         let moves: Pos[] = [];
-        
-        switch (this.getSquare(pos)){
+        debugger;
+
+        switch (this.getSquare(pos)) {
             case 'P':
             case 'p':
                 moves = Pawn.getPossibleMoves(pos, this);
@@ -103,5 +142,11 @@ export class Board {
 
         this.currentPossibleMoves = moves;
         return moves;
+    }
+
+    isKingInCheck(): boolean {
+        if (Pawn.isAnyCheck(this)) return true;
+        if (Bishop.isAnyCheck(this)) return true;
+        return false;
     }
 }
