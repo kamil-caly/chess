@@ -11,7 +11,6 @@ function ChessBoard() {
     const board = useRef<Board | null>(null);
 
     useEffect(() => {
-        //debugger;
         board.current = new Board();
         initBoardSquares();
     }, []);
