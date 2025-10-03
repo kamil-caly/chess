@@ -15,7 +15,7 @@ function ChessBoard() {
         initBoardSquares();
     }, []);
 
-    const getPieceImage = (piece: PieceType): string | undefined => {
+    const getPieceImage = (piece: PieceType | null): string | undefined => {
         switch (piece) {
             case 'P': return 'wp.png';
             case 'R': return 'wr.png';
@@ -86,7 +86,8 @@ function ChessBoard() {
         
         // wykonanie ruchu
         if (board.current.clickedField && board.current.currentPossibleMoves.some(pm => pm.row === pos.row && pm.col === pos.col)) {
-            const clickedFieldPiece: PieceType = board.current.getSquare(board.current.clickedField);
+            const clickedFieldPiece: PieceType | null = board.current.getSquare(board.current.clickedField);
+            if (clickedFieldPiece === null) return;
 
             // Aktualizujemy figury na szachownicy:
             // 1) Tam gdzie była figura jest puste pole

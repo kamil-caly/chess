@@ -1,6 +1,8 @@
 import type { PieceType, Player } from "../ChessTypes";
 import { Bishop } from "./Pieces/Bishop";
+import { King } from "./Pieces/King";
 import { Pawn } from "./Pieces/Pawn";
+import { Queen } from "./Pieces/Queen";
 import { Rook } from "./Pieces/Rook";
 import { Pos } from "./Pos";
 
@@ -31,7 +33,8 @@ export class Board {
         ];
     }
 
-    getSquare(pos: Pos): PieceType {
+    getSquare(pos: Pos): PieceType | null {
+        if (pos.row < 0 || pos.row > 7 || pos.col < 0 || pos.col > 7) return null;
         return this.squares[pos.row][pos.col];
     }
 
@@ -46,11 +49,13 @@ export class Board {
     }
 
     isWhitePiece(pos: Pos): boolean {
-        return this.whitePieces.includes(this.squares[pos.row][pos.col]);
+        const piece = this.getSquare(pos);
+        return piece === null ? false : this.whitePieces.includes(piece);
     }
 
     isBlackPiece(pos: Pos): boolean {
-        return this.blackPieces.includes(this.squares[pos.row][pos.col]);
+        const piece = this.getSquare(pos);
+        return piece === null ? false : this.blackPieces.includes(piece);
     }
 
     isOppositeColors(pos1: Pos, pos2: Pos): boolean {
@@ -79,6 +84,14 @@ export class Board {
             case 'B':
             case 'b':
                 moves = Bishop.getPossibleMoves(pos, this);
+                break;
+            case 'Q':
+            case 'q':
+                moves = Queen.getPossibleMoves(pos, this);
+                break;
+            case 'K':
+            case 'k':
+                moves = King.getPossibleMoves(pos, this);
                 break;
             default:
                 break;
