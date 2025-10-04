@@ -2,16 +2,17 @@ import type { Board } from "../Board";
 import { Pos } from "../Pos";
 
 export class Rook {
+    static directions = [
+        { dr: -1, dc: 0 }, // up
+        { dr: 1, dc: 0 },  // down
+        { dr: 0, dc: -1 }, // left
+        { dr: 0, dc: 1 }   // right
+    ];
+
     static getPossibleMoves(pos: Pos, board: Board): Pos[] {
         const moves: Pos[] = [];
-        const directions = [
-            { dr: -1, dc: 0 }, // up
-            { dr: 1, dc: 0 },  // down
-            { dr: 0, dc: -1 }, // left
-            { dr: 0, dc: 1 }   // right
-        ];
 
-        for (const { dr, dc } of directions) {
+        for (const { dr, dc } of Rook.directions) {
             let r = pos.row + dr;
             let c = pos.col + dc;
 
@@ -32,5 +33,29 @@ export class Rook {
         }
 
         return moves;
+    }
+
+    static isAnyCheck(boardToCheck: Board): boolean {
+        const rookPos = boardToCheck.getPiecePos(boardToCheck.currentPlayer === 'white' ? 'r' : 'R');
+
+        for (const pos of rookPos) {
+            for (const { dr, dc } of Rook.directions) {
+                let r = pos.row + dr;
+                let c = pos.col + dc;
+
+                while (r >= 0 && r <= 7 && c >= 0 && c <= 7) {
+                    const newPos = new Pos(r, c);
+                    if (boardToCheck.currentPlayer === 'white'
+                        ? boardToCheck.isWhiteKing(newPos)
+                        : boardToCheck.isBlackKing(newPos)) return true;
+                    if (!boardToCheck.isEmpty(newPos)) break;
+
+                    r += dr;
+                    c += dc;
+                }
+            }
+        }
+
+        return false;
     }
 }

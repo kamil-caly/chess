@@ -36,7 +36,7 @@ export class Bishop {
     }
 
     static isAnyCheck(boardToCheck: Board): boolean {
-        const bishopsPos = boardToCheck.getBlackPiecePos(boardToCheck.currentPlayer === 'white' ? 'b' : 'B');
+        const bishopsPos = boardToCheck.getPiecePos(boardToCheck.currentPlayer === 'white' ? 'b' : 'B');
 
         for (const pos of bishopsPos) {
             for (const { dr, dc } of Bishop.directions) {

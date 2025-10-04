@@ -5,8 +5,6 @@ import { Pos } from "../Pos";
 export class Pawn {
     static getPossibleMoves(pos: Pos, board: Board): Pos[] {
         const moves: Pos[] = [];
-        let copyBoard: Board;
-        debugger;
 
         // białe
         if (board.currentPlayer === 'white') {
@@ -14,27 +12,19 @@ export class Pawn {
 
             // ruch
             if (board.isEmpty(new Pos(pos.row - 1, pos.col))) {
-                copyBoard = board.copy();
-                copyBoard.makeMove(pos, new Pos(pos.row - 1, pos.col));
-                if (!copyBoard.isKingInCheck()) moves.push(new Pos(pos.row - 1, pos.col));
+                moves.push(new Pos(pos.row - 1, pos.col));
 
                 if (isFirstMove && board.isEmpty(new Pos(pos.row - 2, pos.col))) {
-                    copyBoard = board.copy();
-                    copyBoard.makeMove(pos, new Pos(pos.row - 2, pos.col));
-                    if (!copyBoard.isKingInCheck()) moves.push(new Pos(pos.row - 2, pos.col));
+                    moves.push(new Pos(pos.row - 2, pos.col));
                 }
             }
 
             // bicia
             if (board.isBlackPiece(new Pos(pos.row - 1, pos.col - 1))) {
-                copyBoard = board.copy();
-                copyBoard.makeMove(pos, new Pos(pos.row - 1, pos.col - 1));
-                if (!copyBoard.isKingInCheck()) moves.push(new Pos(pos.row - 1, pos.col - 1));
+                moves.push(new Pos(pos.row - 1, pos.col - 1));
             }
             if (board.isBlackPiece(new Pos(pos.row - 1, pos.col + 1))) {
-                copyBoard = board.copy();
-                copyBoard.makeMove(pos, new Pos(pos.row - 1, pos.col - 1));
-                if (!copyBoard.isKingInCheck()) moves.push(new Pos(pos.row - 1, pos.col + 1));
+                moves.push(new Pos(pos.row - 1, pos.col + 1));
             }
             // czarne
         } else {
@@ -42,27 +32,19 @@ export class Pawn {
 
             // ruch
             if (board.isEmpty(new Pos(pos.row + 1, pos.col))) {
-                copyBoard = board.copy();
-                copyBoard.makeMove(pos, new Pos(pos.row + 1, pos.col));
-                if (!copyBoard.isKingInCheck()) moves.push(new Pos(pos.row + 1, pos.col));
+                moves.push(new Pos(pos.row + 1, pos.col));
 
                 if (isFirstMove && board.isEmpty(new Pos(pos.row + 2, pos.col))) {
-                    copyBoard = board.copy();
-                    copyBoard.makeMove(pos, new Pos(pos.row + 2, pos.col));
-                    if (!copyBoard.isKingInCheck()) moves.push(new Pos(pos.row + 2, pos.col));
+                    moves.push(new Pos(pos.row + 2, pos.col));
                 }
             }
 
             // bicia
             if (board.isWhitePiece(new Pos(pos.row + 1, pos.col - 1))) {
-                copyBoard = board.copy();
-                copyBoard.makeMove(pos, new Pos(pos.row + 1, pos.col - 1));
-                if (!copyBoard.isKingInCheck()) moves.push(new Pos(pos.row + 1, pos.col - 1));
+                moves.push(new Pos(pos.row + 1, pos.col - 1));
             }
             if (board.isWhitePiece(new Pos(pos.row + 1, pos.col + 1))) {
-                copyBoard = board.copy();
-                copyBoard.makeMove(pos, new Pos(pos.row + 1, pos.col + 1));
-                if (!copyBoard.isKingInCheck()) moves.push(new Pos(pos.row + 1, pos.col + 1));
+                moves.push(new Pos(pos.row + 1, pos.col + 1));
             }
         }
 

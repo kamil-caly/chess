@@ -91,7 +91,7 @@ export class Board {
         return piece === null ? false : piece === 'k';
     }
 
-    getBlackPiecePos(piece: PieceType): Pos[] {
+    getPiecePos(piece: PieceType): Pos[] {
         const piecePos: Pos[] = [];
         for (let r = 0; r <= 7; r++) {
             for (let c = 0; c <= 7; c++) {
@@ -109,7 +109,6 @@ export class Board {
 
     getPossibleMoves(pos: Pos): Pos[] {
         let moves: Pos[] = [];
-        debugger;
 
         switch (this.getSquare(pos)) {
             case 'P':
@@ -140,6 +139,14 @@ export class Board {
                 break;
         }
 
+        debugger;
+        // usuwamy nielegalne ruchy, czyli te po wykonaniu których król był by w szachu
+        moves = moves.filter(move => {
+            const copyBoard = this.copy();
+            copyBoard.makeMove(pos, move);
+            return copyBoard.isKingInCheck() ? false : true;
+        });
+
         this.currentPossibleMoves = moves;
         return moves;
     }
@@ -147,6 +154,10 @@ export class Board {
     isKingInCheck(): boolean {
         if (Pawn.isAnyCheck(this)) return true;
         if (Bishop.isAnyCheck(this)) return true;
+        if (Rook.isAnyCheck(this)) return true;
+        if (Queen.isAnyCheck(this)) return true;
+        if (Knight.isAnyCheck(this)) return true;
+        if (King.isAnyCheck(this)) return true;
         return false;
     }
 }
