@@ -23,8 +23,8 @@ export class Board {
 
     initBoard() {
         this.squares = [
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['', '', '', '', 'k', '', '', ''],
+            ['p', 'p', 'p', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
@@ -169,16 +169,17 @@ export class Board {
             reason: 'CheckMate'
         }
 
-        // Mat -> jeżeli król danego koloru jest w szachu i brak możliwych ruchów
-        if (this.isKingInCheck(player)) {
-            const pos: Pos[] = player === 'white'
-                ? this.whitePieces.flatMap(p => this.getPiecePos(p))
-                : this.blackPieces.flatMap(p => this.getPiecePos(p));
+        const pos: Pos[] = player === 'white'
+            ? this.whitePieces.flatMap(p => this.getPiecePos(p))
+            : this.blackPieces.flatMap(p => this.getPiecePos(p));
 
-            if (pos.every(p => this.getPossibleMoves(p, player).length === 0)) {
-                res.player = this.getDiffPlayer(player);
-                return res;
-            }
+        if (pos.every(p => this.getPossibleMoves(p, player).length === 0)) {
+            // Mat -> jeżeli król danego koloru jest w szachu i brak możliwych ruchów
+            if (this.isKingInCheck(player)) res.player = this.getDiffPlayer(player);
+            // Pat -> jeżeli brak możliwych ruchów ale król danego koloru nie jest w szachu
+            else res.reason = 'StaleMate';
+
+            return res;
         }
 
         return null;

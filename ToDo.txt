@@ -2,7 +2,7 @@
 2. Dawanie szachów. ✔️
 3. Sprawdzanie zwycięstwa:
 - mat ✔️
-- pat
+- pat ✔️
 - 3 krotne powtórzenie pozycji
 - niedostateczny materiał
 - reguła 50 posunięć
