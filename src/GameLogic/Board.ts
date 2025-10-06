@@ -1,4 +1,4 @@
-import type { PieceType, Player } from "../ChessTypes";
+import type { GameOverInfo, PieceType, Player } from "../ChessTypes";
 import { Bishop } from "./Pieces/Bishop";
 import { King } from "./Pieces/King";
 import { Knight } from "./Pieces/Knight";
@@ -107,13 +107,17 @@ export class Board {
         else this.currentPlayer = 'white'
     }
 
-    getPossibleMoves(pos: Pos): Pos[] {
+    getDiffPlayer(player: Player): Player {
+        return player === 'white' ? 'black' : 'white';
+    }
+
+    getPossibleMoves(pos: Pos, player: Player = this.currentPlayer): Pos[] {
         let moves: Pos[] = [];
 
         switch (this.getSquare(pos)) {
             case 'P':
             case 'p':
-                moves = Pawn.getPossibleMoves(pos, this);
+                moves = Pawn.getPossibleMoves(pos, this, player);
                 break;
             case 'R':
             case 'r':
@@ -139,25 +143,44 @@ export class Board {
                 break;
         }
 
-        debugger;
         // usuwamy nielegalne ruchy, czyli te po wykonaniu których król był by w szachu
         moves = moves.filter(move => {
             const copyBoard = this.copy();
             copyBoard.makeMove(pos, move);
-            return copyBoard.isKingInCheck() ? false : true;
+            return copyBoard.isKingInCheck(player) ? false : true;
         });
 
         this.currentPossibleMoves = moves;
         return moves;
     }
 
-    isKingInCheck(): boolean {
-        if (Pawn.isAnyCheck(this)) return true;
-        if (Bishop.isAnyCheck(this)) return true;
-        if (Rook.isAnyCheck(this)) return true;
-        if (Queen.isAnyCheck(this)) return true;
-        if (Knight.isAnyCheck(this)) return true;
-        if (King.isAnyCheck(this)) return true;
+    isKingInCheck(player: Player = this.currentPlayer): boolean {
+        if (Pawn.isAnyCheck(this, player)) return true;
+        if (Bishop.isAnyCheck(this, player)) return true;
+        if (Rook.isAnyCheck(this, player)) return true;
+        if (Queen.isAnyCheck(this, player)) return true;
+        if (Knight.isAnyCheck(this, player)) return true;
+        if (King.isAnyCheck(this, player)) return true;
         return false;
+    }
+
+    checkGameOver(player: Player): GameOverInfo | null {
+        const res: GameOverInfo = {
+            reason: 'CheckMate'
+        }
+
+        // Mat -> jeżeli król danego koloru jest w szachu i brak możliwych ruchów
+        if (this.isKingInCheck(player)) {
+            const pos: Pos[] = player === 'white'
+                ? this.whitePieces.flatMap(p => this.getPiecePos(p))
+                : this.blackPieces.flatMap(p => this.getPiecePos(p));
+
+            if (pos.every(p => this.getPossibleMoves(p, player).length === 0)) {
+                res.player = this.getDiffPlayer(player);
+                return res;
+            }
+        }
+
+        return null;
     }
 }

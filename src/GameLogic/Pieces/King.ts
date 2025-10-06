@@ -1,3 +1,4 @@
+import type { Player } from "../../ChessTypes";
 import type { Board } from "../Board";
 import { Pos } from "../Pos";
 
@@ -18,8 +19,8 @@ export class King {
         const moves: Pos[] = [];
 
         for (const { dr, dc } of King.directions) {
-            let r = pos.row + dr;
-            let c = pos.col + dc;
+            const r = pos.row + dr;
+            const c = pos.col + dc;
 
             const newPos = new Pos(r, c);
             if (board.isEmpty(newPos) || board.isOppositeColors(pos, newPos)) {
@@ -30,16 +31,16 @@ export class King {
         return moves;
     }
 
-    static isAnyCheck(boardToCheck: Board): boolean {
-        const kingPos = boardToCheck.getPiecePos(boardToCheck.currentPlayer === 'white' ? 'k' : 'K');
+    static isAnyCheck(boardToCheck: Board, player: Player): boolean {
+        const kingPos = boardToCheck.getPiecePos(player === 'white' ? 'k' : 'K');
 
         for (const pos of kingPos) {
             for (const { dr, dc } of King.directions) {
-                let r = pos.row + dr;
-                let c = pos.col + dc;
+                const r = pos.row + dr;
+                const c = pos.col + dc;
 
                 const newPos = new Pos(r, c);
-                if (boardToCheck.currentPlayer === 'white'
+                if (player === 'white'
                     ? boardToCheck.isWhiteKing(newPos)
                     : boardToCheck.isBlackKing(newPos)) return true;
             }

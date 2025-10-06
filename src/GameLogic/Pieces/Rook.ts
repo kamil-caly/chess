@@ -1,3 +1,4 @@
+import type { Player } from "../../ChessTypes";
 import type { Board } from "../Board";
 import { Pos } from "../Pos";
 
@@ -35,8 +36,8 @@ export class Rook {
         return moves;
     }
 
-    static isAnyCheck(boardToCheck: Board): boolean {
-        const rookPos = boardToCheck.getPiecePos(boardToCheck.currentPlayer === 'white' ? 'r' : 'R');
+    static isAnyCheck(boardToCheck: Board, player: Player): boolean {
+        const rookPos = boardToCheck.getPiecePos(player === 'white' ? 'r' : 'R');
 
         for (const pos of rookPos) {
             for (const { dr, dc } of Rook.directions) {
@@ -45,7 +46,7 @@ export class Rook {
 
                 while (r >= 0 && r <= 7 && c >= 0 && c <= 7) {
                     const newPos = new Pos(r, c);
-                    if (boardToCheck.currentPlayer === 'white'
+                    if (player === 'white'
                         ? boardToCheck.isWhiteKing(newPos)
                         : boardToCheck.isBlackKing(newPos)) return true;
                     if (!boardToCheck.isEmpty(newPos)) break;

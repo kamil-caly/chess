@@ -13,3 +13,10 @@ export type BoardSquare = {
 export type PieceType = 'P' | 'R' | 'N' | 'B' | 'Q' | 'K' | 'p' | 'r' | 'n' | 'b' | 'q' | 'k' | '';
 
 export type Player = 'white' | 'black';
+
+export type GameOverReason = 'CheckMate' | 'StaleMate' | 'ThreefoldRepetition' | 'FiftyMoveRule' | 'InsufficientMaterial';
+
+export type GameOverInfo = {
+    reason: GameOverReason,
+    player?: Player
+}

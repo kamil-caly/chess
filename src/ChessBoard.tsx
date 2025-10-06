@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react"
 import Square from './ChessSquare';
-import type { BoardSquare, PieceType } from "./ChessTypes";
+import type { BoardSquare, GameOverInfo, PieceType } from "./ChessTypes";
 import { Board } from "./GameLogic/Board";
 import { Pos } from "./GameLogic/Pos";
 
@@ -9,6 +9,8 @@ import { Pos } from "./GameLogic/Pos";
 function ChessBoard() {
     const [squares, setSquares] = useState<BoardSquare[]>([]);
     const board = useRef<Board | null>(null);
+    const isGameOver = useRef<boolean>(false);
+    const gameOverInfo = useRef<GameOverInfo | null>(null);
 
     useEffect(() => {
         board.current = new Board();
@@ -82,7 +84,7 @@ function ChessBoard() {
     }
 
     const fieldOnClick = (pos: Pos) => {
-        if (!board.current) return;
+        if (!board.current || isGameOver.current) return;
         
         // wykonanie ruchu
         if (board.current.clickedField && board.current.currentPossibleMoves.some(pm => pm.row === pos.row && pm.col === pos.col)) {
@@ -97,6 +99,13 @@ function ChessBoard() {
 
             // aktualizujemy GUI
             updateBoardSquaresAfterMove();
+
+            // sprawdzenie czy koniec gry
+            const gameOverRes = board.current.checkGameOver(board.current.currentPlayer === 'white' ? 'black' : 'white');
+            if (gameOverRes !== null) {
+                isGameOver.current = true;
+                gameOverInfo.current = gameOverRes;
+            }
 
             board.current.clickedField = undefined;
             board.current.currentPossibleMoves = [];
@@ -137,6 +146,27 @@ function ChessBoard() {
                         clicked={s.clicked}
                         possibleMove={s.possibleMove} />
                 ))}
+            </div>
+            <div style={{
+                display: isGameOver.current ? 'flex' : 'none',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                gap: '10px',
+                position: "absolute",
+                left: 'calc(50% - 120px)',
+                top: 'calc(50% - 75px)',
+                width: '240px',
+                height: '150px',
+                backgroundColor: '#312e2b',
+                borderRadius: '10px',
+                opacity: '0.9',
+                fontSize: '24px'
+            }}>
+                <div>{`${gameOverInfo.current?.player
+                    ? String(gameOverInfo.current?.player).charAt(0).toUpperCase() + String(gameOverInfo.current?.player).slice(1) + ' Won'
+                    : 'Draw'}`}</div>
+                <div>{`by ${gameOverInfo.current?.reason}`}</div>
             </div>
         </>
     );

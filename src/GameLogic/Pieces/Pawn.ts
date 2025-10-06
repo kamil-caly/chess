@@ -1,13 +1,14 @@
+import type { Player } from "../../ChessTypes";
 import type { Board } from "../Board";
 import { Pos } from "../Pos";
 
 
 export class Pawn {
-    static getPossibleMoves(pos: Pos, board: Board): Pos[] {
+    static getPossibleMoves(pos: Pos, board: Board, player: Player): Pos[] {
         const moves: Pos[] = [];
 
         // białe
-        if (board.currentPlayer === 'white') {
+        if (player === 'white') {
             const isFirstMove: boolean = pos.row === 6;
 
             // ruch
@@ -51,9 +52,9 @@ export class Pawn {
         return moves;
     }
 
-    static isAnyCheck(boardToCheck: Board): boolean {
+    static isAnyCheck(boardToCheck: Board, player: Player): boolean {
         // białe
-        if (boardToCheck.currentPlayer === 'white') {
+        if (player === 'white') {
             for (let r = 0; r <= 7; r++) {
                 for (let c = 0; c <= 7; c++) {
                     if (boardToCheck.getSquare(new Pos(r, c)) === 'p') {

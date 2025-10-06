@@ -1,3 +1,4 @@
+import type { Player } from "../../ChessTypes";
 import type { Board } from "../Board";
 import { Pos } from "../Pos";
 
@@ -35,8 +36,8 @@ export class Bishop {
         return moves;
     }
 
-    static isAnyCheck(boardToCheck: Board): boolean {
-        const bishopsPos = boardToCheck.getPiecePos(boardToCheck.currentPlayer === 'white' ? 'b' : 'B');
+    static isAnyCheck(boardToCheck: Board, player: Player): boolean {
+        const bishopsPos = boardToCheck.getPiecePos(player === 'white' ? 'b' : 'B');
 
         for (const pos of bishopsPos) {
             for (const { dr, dc } of Bishop.directions) {
@@ -45,7 +46,7 @@ export class Bishop {
 
                 while (r >= 0 && r <= 7 && c >= 0 && c <= 7) {
                     const newPos = new Pos(r, c);
-                    if (boardToCheck.currentPlayer === 'white'
+                    if (player === 'white'
                         ? boardToCheck.isWhiteKing(newPos)
                         : boardToCheck.isBlackKing(newPos)) return true;
                     if (!boardToCheck.isEmpty(newPos)) break;
