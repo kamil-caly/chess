@@ -23,14 +23,14 @@ export class Board {
 
     initBoard() {
         this.squares = [
-            ['', '', '', '', 'k', '', '', ''],
-            ['p', 'p', 'p', '', '', '', '', ''],
+            ['', '', 'b', 'b', 'k', '', '', ''],
+            ['p', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
-            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
+            ['', '', '', '', '', '', '', ''],
+            ['', '', 'B', 'B', 'K', '', '', 'R'],
         ];
     }
 
@@ -111,6 +111,14 @@ export class Board {
         return player === 'white' ? 'black' : 'white';
     }
 
+    isWhiteField(pos: Pos): boolean {
+        if (pos.row % 2 === 0) {
+            return pos.col % 2 === 0 ? true : false;
+        }
+
+        return pos.col % 2 === 0 ? false : true;
+    }
+
     getPossibleMoves(pos: Pos, player: Player = this.currentPlayer): Pos[] {
         let moves: Pos[] = [];
 
@@ -180,6 +188,36 @@ export class Board {
             else res.reason = 'StaleMate';
 
             return res;
+        }
+
+        // Remis -> Brak materiału by zamatować (insufficient material)
+        const piecesLeft = this.squares.flat().filter(s => s !== '');
+        if (piecesLeft.length === 2) {
+            // K vs K
+            res.reason = 'InsufficientMaterial';
+            return res;
+        }
+        if (piecesLeft.length === 3) {
+            // K+B vs K
+            if (piecesLeft.some(p => p === 'B' || p === 'b')) {
+                res.reason = 'InsufficientMaterial';
+                return res;
+            }
+            // K+N vs K
+            if (piecesLeft.some(p => p === 'N' || p === 'n')) {
+                res.reason = 'InsufficientMaterial';
+                return res;
+            }
+        }
+        if (piecesLeft.length === 4) {
+            // K+B vs K+B (ten sam kolor pól)
+            if (piecesLeft.some(p => p === 'B') && piecesLeft.some(p => p === 'b')) {
+                if (this.isWhiteField(this.getPiecePos('B')[0]) && this.isWhiteField(this.getPiecePos('b')[0]) ||
+                    !this.isWhiteField(this.getPiecePos('B')[0]) && !this.isWhiteField(this.getPiecePos('b')[0])) {
+                    res.reason = 'InsufficientMaterial';
+                    return res;
+                }
+            }
         }
 
         return null;

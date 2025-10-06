@@ -4,7 +4,7 @@
 - mat ✔️
 - pat ✔️
 - 3 krotne powtórzenie pozycji
-- niedostateczny materiał
+- niedostateczny materiał ✔️
 - reguła 50 posunięć
 4. Promocja piona.
 5. Roszada.
