@@ -1,7 +1,7 @@
 1. Podstawowe ruchy. ✔️
 2. Dawanie szachów. ✔️
 3. Sprawdzanie zwycięstwa:
-- mat
+- mat ✔️
 - pat
 - 3 krotne powtórzenie pozycji
 - niedostateczny materiał
