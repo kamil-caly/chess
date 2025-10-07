@@ -15,9 +15,11 @@ export class Board {
     squares: PieceType[][] = [];
     whitePieces: PieceType[] = ['P', 'R', 'N', 'B', 'Q', 'K'];
     blackPieces: PieceType[] = ['p', 'r', 'n', 'b', 'q', 'k'];
+    movesWithoutCapturedAndPawnRelocateCount: number;
 
     constructor() {
         this.currentPlayer = 'white';
+        this.movesWithoutCapturedAndPawnRelocateCount = 0;
         this.initBoard();
     }
 
@@ -44,11 +46,36 @@ export class Board {
         return copyBoard;
     }
 
-    makeMove(from: Pos, to: Pos): void {
+    movePiece(from: Pos, to: Pos): void {
         const piece = this.getSquare(from);
         if (piece === null) return;
         this.setSquare(from, '');
         this.setSquare(to, piece);
+    }
+
+    executeGameMove(to: Pos): boolean {
+        if (!this.clickedField) return false;
+
+        const clickedPiece = this.getSquare(this.clickedField);
+        if (clickedPiece === null || clickedPiece === '') return false;
+
+        // Jeżli następuje bicie lub ruch pionem to resetujemy zmienną odpowiadającą za regułę: 50MoveRule
+        if (this.getSquare(to) !== '' || clickedPiece === 'P' || clickedPiece === 'p') {
+            this.movesWithoutCapturedAndPawnRelocateCount = 0;
+        } else {
+            this.movesWithoutCapturedAndPawnRelocateCount++;
+        }
+
+        // Aktualizujemy figury na szachownicy:
+        // 1) Tam gdzie była figura jest puste pole
+        this.setSquare(this.clickedField, '');
+        // 2) Tam gdzie się ruszyliśmy jest teraz ta figura
+        this.setSquare(to, clickedPiece);
+
+        this.clickedField = undefined;
+        this.currentPossibleMoves = [];
+        this.switchPlayer();
+        return true;
     }
 
     getSquare(pos: Pos): PieceType | null {
@@ -154,7 +181,7 @@ export class Board {
         // usuwamy nielegalne ruchy, czyli te po wykonaniu których król był by w szachu
         moves = moves.filter(move => {
             const copyBoard = this.copy();
-            copyBoard.makeMove(pos, move);
+            copyBoard.movePiece(pos, move);
             return copyBoard.isKingInCheck(player) ? false : true;
         });
 
@@ -218,6 +245,12 @@ export class Board {
                     return res;
                 }
             }
+        }
+
+        // Remis -> Jeżeli po 50 ruchach nie nastąpi żadne bicie lub ruch pionem (50MoveRule)
+        if (this.movesWithoutCapturedAndPawnRelocateCount >= 50) {
+            res.reason = 'FiftyMoveRule';
+            return res;
         }
 
         return null;

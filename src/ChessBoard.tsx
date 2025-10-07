@@ -83,33 +83,22 @@ function ChessBoard() {
         }))
     }
 
-    const fieldOnClick = (pos: Pos) => {
+    const fieldOnClick = (pos: Pos): void => {
         if (!board.current || isGameOver.current) return;
         
         // wykonanie ruchu
         if (board.current.clickedField && board.current.currentPossibleMoves.some(pm => pm.row === pos.row && pm.col === pos.col)) {
-            const clickedFieldPiece: PieceType | null = board.current.getSquare(board.current.clickedField);
-            if (clickedFieldPiece === null) return;
+            if (!board.current.executeGameMove(pos)) return;
 
-            // Aktualizujemy figury na szachownicy:
-            // 1) Tam gdzie była figura jest puste pole
-            board.current.setSquare(board.current.clickedField, '');
-            // 2) Tam gdzie się ruszyliśmy jest teraz ta figura
-            board.current.setSquare(pos, clickedFieldPiece);
-
-            // aktualizujemy GUI
+            // aktualizacja GUI
             updateBoardSquaresAfterMove();
 
             // sprawdzenie czy koniec gry
-            const gameOverRes = board.current.checkGameOver(board.current.currentPlayer === 'white' ? 'black' : 'white');
+            const gameOverRes = board.current.checkGameOver(board.current.currentPlayer);
             if (gameOverRes !== null) {
                 isGameOver.current = true;
                 gameOverInfo.current = gameOverRes;
             }
-
-            board.current.clickedField = undefined;
-            board.current.currentPossibleMoves = [];
-            board.current.switchPlayer();
         } else {
             // wybranie figury do ruchu
             if (board.current.isEmpty(pos)) return;
@@ -118,7 +107,6 @@ function ChessBoard() {
 
             board.current.clickedField = pos;
             const possibleMoves = board.current.getPossibleMoves(pos);
-            console.log('possibleMoves: ', possibleMoves);
 
             upateBoardSquaresAfterPieceClick(pos, possibleMoves);
         }
