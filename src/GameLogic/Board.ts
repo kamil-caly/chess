@@ -16,23 +16,28 @@ export class Board {
     whitePieces: PieceType[] = ['P', 'R', 'N', 'B', 'Q', 'K'];
     blackPieces: PieceType[] = ['p', 'r', 'n', 'b', 'q', 'k'];
     movesWithoutCapturedAndPawnRelocateCount: number;
+    lastBoardPositions: Map<string, number>;
 
     constructor() {
         this.currentPlayer = 'white';
         this.movesWithoutCapturedAndPawnRelocateCount = 0;
+        this.lastBoardPositions = new Map();
         this.initBoard();
+        this.lastBoardPositions.set(
+            `${(this.squares.flat() as string[]).reduce((acc, curr) => (acc + (curr !== '' ? curr : '_')), '')}`, 1
+        );
     }
 
     initBoard() {
         this.squares = [
-            ['', '', 'b', 'b', 'k', '', '', ''],
-            ['p', '', '', '', '', '', '', ''],
+            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
+            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['', '', 'B', 'B', 'K', '', '', 'R'],
+            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
+            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
         ];
     }
 
@@ -59,9 +64,12 @@ export class Board {
         const clickedPiece = this.getSquare(this.clickedField);
         if (clickedPiece === null || clickedPiece === '') return false;
 
-        // Jeżli następuje bicie lub ruch pionem to resetujemy zmienną odpowiadającą za regułę: 50MoveRule
+        // Jeżli następuje bicie lub ruch pionem to:
+        // - resetujemy zmienną odpowiadającą za regułę: 50MoveRule
+        // - czyścimy słownik z ostatnimi pozycjami na planszy
         if (this.getSquare(to) !== '' || clickedPiece === 'P' || clickedPiece === 'p') {
             this.movesWithoutCapturedAndPawnRelocateCount = 0;
+            this.lastBoardPositions.clear();
         } else {
             this.movesWithoutCapturedAndPawnRelocateCount++;
         }
@@ -72,6 +80,15 @@ export class Board {
         // 2) Tam gdzie się ruszyliśmy jest teraz ta figura
         this.setSquare(to, clickedPiece);
 
+        let positionCount = this.lastBoardPositions.get(
+            `${(this.squares.flat() as string[]).reduce((acc, curr) => (acc + (curr !== '' ? curr : '_')), '')}`
+        );
+        this.lastBoardPositions.set(
+            `${(this.squares.flat() as string[]).reduce((acc, curr) => (acc + (curr !== '' ? curr : '_')), '')}`,
+            positionCount !== undefined ? ++positionCount : 1
+        );
+
+        console.log('this.lastBoardPositions: ', this.lastBoardPositions);
         this.clickedField = undefined;
         this.currentPossibleMoves = [];
         this.switchPlayer();
@@ -247,7 +264,15 @@ export class Board {
             }
         }
 
-        // Remis -> Jeżeli po 50 ruchach nie nastąpi żadne bicie lub ruch pionem (50MoveRule)
+        // Remis -> Jeżeli nastąpi 3-krotne powtórzenie pozycji (threeFoldRepetition Rule)
+        for (const cnt of this.lastBoardPositions.values()) {
+            if (cnt >= 3) {
+                res.reason = 'ThreefoldRepetition';
+                return res;
+            }
+        }
+
+        // Remis -> Jeżeli po 50 ruchach nie nastąpi żadne bicie lub ruch pionem (50Move Rule)
         if (this.movesWithoutCapturedAndPawnRelocateCount >= 50) {
             res.reason = 'FiftyMoveRule';
             return res;

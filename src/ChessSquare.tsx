@@ -23,8 +23,6 @@ const Square: React.FC<SquareProps> = (props) => {
         return `${topLeft} ${topRight} ${bottomRight} ${bottomLeft}`;
     }
 
-    console.log('props.possibleMoves: ', props.possibleMove)
-
     const getBgColor = (): string => {
         if (props.color === 'light') {
             return props.clicked ? LIGHT_SQ_PRESSED_COLOR : LIGHT_SQ_COLOR;
