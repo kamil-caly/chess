@@ -58,6 +58,15 @@ export class Board {
         this.setSquare(to, piece);
     }
 
+    capturePawnIfEnPassantMove(piece: PieceType, to: Pos): void {
+        if (this.clickedField!.col !== to.col && this.getSquare(to) === '') {
+            // usuwamy czarnego piona
+            if (piece === 'P') this.setSquare(new Pos(to.row + 1, to.col), '');
+            // usuwamy białego piona
+            else if (piece === 'p') this.setSquare(new Pos(to.row - 1, to.col), '');
+        }
+    }
+
     executeGameMove(to: Pos): boolean {
         if (!this.clickedField) return false;
 
@@ -75,6 +84,8 @@ export class Board {
         }
 
         // Aktualizujemy figury na szachownicy:
+        // *) Jeżeli nastąpiło bicie w przelocie to usuwamy figurę z pola 'obok'
+        this.capturePawnIfEnPassantMove(clickedPiece, to);
         // 1) Tam gdzie była figura jest puste pole
         this.setSquare(this.clickedField, '');
         // 2) Tam gdzie się ruszyliśmy jest teraz ta figura
@@ -88,7 +99,16 @@ export class Board {
             positionCount !== undefined ? ++positionCount : 1
         );
 
-        console.log('this.lastBoardPositions: ', this.lastBoardPositions);
+        if (
+            (clickedPiece === 'P' || clickedPiece === 'p') &&
+            to.col === this.clickedField.col &&
+            (to.row + 2 === this.clickedField.row || to.row - 2 === this.clickedField.row)
+        ) {
+            Pawn.last2SquaredMove = new Pos(to.row, to.col);
+        } else {
+            Pawn.last2SquaredMove = null;
+        }
+
         this.clickedField = undefined;
         this.currentPossibleMoves = [];
         this.switchPlayer();

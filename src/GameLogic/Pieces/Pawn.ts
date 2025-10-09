@@ -4,6 +4,8 @@ import { Pos } from "../Pos";
 
 
 export class Pawn {
+    static last2SquaredMove: Pos | null = null;
+
     static getPossibleMoves(pos: Pos, board: Board, player: Player): Pos[] {
         const moves: Pos[] = [];
 
@@ -27,6 +29,13 @@ export class Pawn {
             if (board.isBlackPiece(new Pos(pos.row - 1, pos.col + 1))) {
                 moves.push(new Pos(pos.row - 1, pos.col + 1));
             }
+            // en passant
+            if (Pawn.last2SquaredMove) {
+                if (pos.row === Pawn.last2SquaredMove.row) {
+                    if (pos.col + 1 === Pawn.last2SquaredMove.col) moves.push(new Pos(pos.row - 1, pos.col + 1));
+                    else if (pos.col - 1 === Pawn.last2SquaredMove.col) moves.push(new Pos(pos.row - 1, pos.col - 1));
+                }
+            }
             // czarne
         } else {
             const isFirstMove: boolean = pos.row === 1;
@@ -46,6 +55,13 @@ export class Pawn {
             }
             if (board.isWhitePiece(new Pos(pos.row + 1, pos.col + 1))) {
                 moves.push(new Pos(pos.row + 1, pos.col + 1));
+            }
+            // en passant
+            if (Pawn.last2SquaredMove) {
+                if (pos.row === Pawn.last2SquaredMove.row) {
+                    if (pos.col + 1 === Pawn.last2SquaredMove.col) moves.push(new Pos(pos.row + 1, pos.col + 1));
+                    else if (pos.col - 1 === Pawn.last2SquaredMove.col) moves.push(new Pos(pos.row + 1, pos.col - 1));
+                }
             }
         }
 
