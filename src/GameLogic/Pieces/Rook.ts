@@ -10,6 +10,13 @@ export class Rook {
         { dr: 0, dc: 1 }   // right
     ];
 
+    static rookHasMoved = {
+        wk: false,
+        wq: false,
+        bk: false,
+        bq: false
+    }
+
     static getPossibleMoves(pos: Pos, board: Board): Pos[] {
         const moves: Pos[] = [];
 

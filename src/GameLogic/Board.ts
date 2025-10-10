@@ -30,14 +30,14 @@ export class Board {
 
     initBoard() {
         this.squares = [
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
+            ['r', 'r', 'r', '', 'k', '', '', 'r'],
+            ['p', 'p', 'p', '', '', 'p', 'p', 'p'],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
             ['', '', '', '', '', '', '', ''],
-            ['', '', '', '', '', '', '', ''],
-            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R'],
+            ['', '', '', '', 'R', '', '', ''],
+            ['P', 'P', '', '', '', 'P', 'P', 'P'],
+            ['R', '', '', '', 'K', '', '', 'R'],
         ];
     }
 
@@ -67,6 +67,40 @@ export class Board {
         }
     }
 
+    MoveRookIfCastling(piece: PieceType, to: Pos): void {
+        if (piece === 'k' && !King.blackKingMoved) {
+            if (to.col === 6) {
+                this.setSquare(new Pos(0, 7), '');
+                this.setSquare(new Pos(0, 5), 'r');
+            } else if (to.col === 2) {
+                this.setSquare(new Pos(0, 0), '');
+                this.setSquare(new Pos(0, 3), 'r');
+            }
+        } else if (piece === 'K' && !King.whiteKingMoved) {
+            if (to.col === 6) {
+                this.setSquare(new Pos(7, 7), '');
+                this.setSquare(new Pos(7, 5), 'R');
+            } else if (to.col === 2) {
+                this.setSquare(new Pos(7, 0), '');
+                this.setSquare(new Pos(7, 3), 'R');
+            }
+        }
+    }
+
+    updateKingRookMovedProps = (pos: Pos): void => {
+        if (pos.row === 0 && pos.col === 4) King.blackKingMoved = true;
+        else if (pos.row === 7 && pos.col === 4) King.whiteKingMoved = true;
+
+        else if (pos.row === 0) {
+            if (pos.col === 0) Rook.rookHasMoved.bq = true;
+            else if (pos.col === 7) Rook.rookHasMoved.bk = true;
+        }
+        else if (pos.row === 7) {
+            if (pos.col === 0) Rook.rookHasMoved.wq = true;
+            if (pos.col === 7) Rook.rookHasMoved.wk = true;
+        }
+    }
+
     executeGameMove(to: Pos): boolean {
         if (!this.clickedField) return false;
 
@@ -86,10 +120,15 @@ export class Board {
         // Aktualizujemy figury na szachownicy:
         // *) Jeżeli nastąpiło bicie w przelocie to usuwamy figurę z pola 'obok'
         this.capturePawnIfEnPassantMove(clickedPiece, to);
+        // *) Jeżeli następuje roszada to przesuwamy wieżę z drugiej strony króla
+        this.MoveRookIfCastling(clickedPiece, to);
+
         // 1) Tam gdzie była figura jest puste pole
         this.setSquare(this.clickedField, '');
         // 2) Tam gdzie się ruszyliśmy jest teraz ta figura
         this.setSquare(to, clickedPiece);
+
+        this.updateKingRookMovedProps(this.clickedField);
 
         let positionCount = this.lastBoardPositions.get(
             `${(this.squares.flat() as string[]).reduce((acc, curr) => (acc + (curr !== '' ? curr : '_')), '')}`
