@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { BoardSquare } from "./ChessTypes"
 import { Pos } from "./GameLogic/Pos";
 
@@ -11,6 +12,15 @@ const LIGHT_SQ_MOVE_CIRCLE_COLOR = '#cacbb3';
 const DARK_SQ_MOVE_CIRCLE_COLOR = '#638046';
 
 const Square: React.FC<SquareProps> = (props) => {
+    const pawnPromoDiv = useRef<HTMLDivElement | null>(null);
+
+    useEffect(() => {
+        if (!pawnPromoDiv.current) return;
+
+        if (props.isPawnPromo) {
+            if (props.rowIdx === 7) pawnPromoDiv.current!.style.bottom = '0';
+        }
+    }, [props.isPawnPromo]);
 
     // border-radius: top-left top-right bottom-right bottom-left
     const getBorderRadiusStyle = (): string => {
@@ -43,7 +53,7 @@ const Square: React.FC<SquareProps> = (props) => {
                 position: 'relative',
                 cursor: props.img ? 'pointer' : 'default'
             }}
-            onClick={() => props.onClick?.(new Pos(props.rowIdx, props.colIdx))}
+            onClick={() => props.onFieldClick?.(new Pos(props.rowIdx, props.colIdx))}
         >
             {/* Indeks wiersza (liczba) */}
             {props.colIdx === 0 && (
@@ -62,6 +72,7 @@ const Square: React.FC<SquareProps> = (props) => {
                     {props.rowIdx + 1}
                 </div>
             )}
+
             {/* Indeks kolumny (litera) */}
             {props.rowIdx === 7 && (
                 <div
@@ -79,6 +90,7 @@ const Square: React.FC<SquareProps> = (props) => {
                     {String.fromCharCode(97 + props.colIdx)}
                 </div>
             )}
+
             {/* Figura */}
             {props.img && (
                 <img
@@ -88,6 +100,7 @@ const Square: React.FC<SquareProps> = (props) => {
                     }} 
                     src={`/assets/${props.img}`} />
             )}
+
             {/* Podświetlenie możliwego ruchu */}
             {props.possibleMove && (
                 <div
@@ -101,6 +114,44 @@ const Square: React.FC<SquareProps> = (props) => {
                             left: 'calc(50% - 0.8vw)'
                     }}>
 
+                </div>
+            )}
+
+            {/* Promocja piona */}
+            {props.isPawnPromo && (
+                <div ref={pawnPromoDiv} style={{
+                    left: '-1px',
+                    position: 'absolute',
+                    backgroundColor: 'white',
+                    width: '100%',
+                    zIndex: '1',
+                    borderRadius: '10px',
+                    border: '2px solid black'
+                }}>
+                    <img
+                        style={{
+                            width: '100%',
+                        }}
+                        onClick={() => props.onPawnPromoClick?.(props.rowIdx === 0 ? 'Q' : 'q', new Pos(props.rowIdx, props.colIdx))}
+                        src={`/assets/${props.rowIdx === 0 ? 'w' : 'b'}q.png`} />
+                    <img
+                        style={{
+                            width: '100%',
+                        }}
+                        onClick={() => props.onPawnPromoClick?.(props.rowIdx === 0 ? 'N' : 'n', new Pos(props.rowIdx, props.colIdx))}
+                        src={`/assets/${props.rowIdx === 0 ? 'w' : 'b'}n.png`} />
+                    <img
+                        style={{
+                            width: '100%',
+                        }}
+                        onClick={() => props.onPawnPromoClick?.(props.rowIdx === 0 ? 'R' : 'r', new Pos(props.rowIdx, props.colIdx))}
+                        src={`/assets/${props.rowIdx === 0 ? 'w' : 'b'}r.png`} />
+                    <img
+                        style={{
+                            width: '100%',
+                        }}
+                        onClick={() => props.onPawnPromoClick?.(props.rowIdx === 0 ? 'B' : 'b', new Pos(props.rowIdx, props.colIdx))}
+                        src={`/assets/${props.rowIdx === 0 ? 'w' : 'b'}b.png`} />
                 </div>
             )}
         </div>

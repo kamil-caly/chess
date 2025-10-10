@@ -183,6 +183,11 @@ export class Board {
         return pos.col % 2 === 0 ? false : true;
     }
 
+    isPawnPromotion(pos: Pos): boolean {
+        return (this.getSquare(pos) === 'P' && pos.row === 0) ||
+            (this.getSquare(pos) === 'p' && pos.row === 7);
+    }
+
     getPossibleMoves(pos: Pos, player: Player = this.currentPlayer): Pos[] {
         let moves: Pos[] = [];
 

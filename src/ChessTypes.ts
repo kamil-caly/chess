@@ -7,7 +7,9 @@ export type BoardSquare = {
     img?: string,
     clicked: boolean,
     possibleMove: boolean,
-    onClick?: (pos: Pos) => void
+    isPawnPromo: boolean,
+    onFieldClick?: (pos: Pos) => void,
+    onPawnPromoClick?: (piece: PieceType, pos: Pos) => void
 }
 
 export type PieceType = 'P' | 'R' | 'N' | 'B' | 'Q' | 'K' | 'p' | 'r' | 'n' | 'b' | 'q' | 'k' | '';

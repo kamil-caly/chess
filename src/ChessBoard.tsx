@@ -51,7 +51,8 @@ function ChessBoard() {
                     color: tmpColor,
                     img: getPieceImage(board.current!.getSquare(new Pos(r, c))),
                     clicked: false,
-                    possibleMove: false
+                    possibleMove: false,
+                    isPawnPromo: false
                 });
             }
         }
@@ -66,7 +67,18 @@ function ChessBoard() {
                 ...s,
                 clicked: false,
                 possibleMove: false,
-                img: getPieceImage(board.current!.getSquare(new Pos(s.rowIdx, s.colIdx))),
+                img: getPieceImage(board.current!.getSquare(new Pos(s.rowIdx, s.colIdx)))
+            }
+        }));
+    }
+
+    const updateBoardSquaresAfterPawnPromo = (pos: Pos | null) => {
+        if (!board.current) return;
+
+        setSquares(sq => sq.map(s => {
+            return {
+                ...s,
+                isPawnPromo: pos ? s.rowIdx === pos.row && s.colIdx === pos.col : false
             }
         }));
     }
@@ -83,8 +95,9 @@ function ChessBoard() {
         }))
     }
 
-    const fieldOnClick = (pos: Pos): void => {
+    const onFieldClick = (pos: Pos, checkPromo: boolean = true): void => {
         if (!board.current || isGameOver.current) return;
+        if (squares.some(s => s.isPawnPromo) && checkPromo) return;
         
         // wykonanie ruchu
         if (board.current.clickedField && board.current.currentPossibleMoves.some(pm => pm.row === pos.row && pm.col === pos.col)) {
@@ -99,6 +112,9 @@ function ChessBoard() {
                 isGameOver.current = true;
                 gameOverInfo.current = gameOverRes;
             }
+
+            // sprawdzenie czy promocja piona
+            if (board.current.isPawnPromotion(pos)) updateBoardSquaresAfterPawnPromo(pos);
         } else {
             // wybranie figury do ruchu
             if (board.current.isEmpty(pos)) return;
@@ -112,8 +128,26 @@ function ChessBoard() {
         }
     }
 
+    const onPawnPromoClick = (piece: PieceType, pos: Pos): void => {
+        if (!board.current) return;
+
+        updateBoardSquaresAfterPawnPromo(null);
+        board.current!.setSquare(pos, piece);
+
+        // aktualizacja GUI
+        updateBoardSquaresAfterMove();
+
+        // sprawdzenie czy koniec gry
+        const gameOverRes = board.current!.checkGameOver(board.current!.currentPlayer);
+        if (gameOverRes !== null) {
+            isGameOver.current = true;
+            gameOverInfo.current = gameOverRes;
+        }
+    }
+
     return (
         <>
+            {/* Szachownica */}
             <div style={{
                 display: 'grid',
                 gridTemplateColumns: 'repeat(8, 1fr)',
@@ -130,11 +164,15 @@ function ChessBoard() {
                         colIdx={s.colIdx}
                         color={s.color}
                         img={s.img}
-                        onClick={fieldOnClick}
+                        onFieldClick={onFieldClick}
+                        onPawnPromoClick={onPawnPromoClick}
                         clicked={s.clicked}
-                        possibleMove={s.possibleMove} />
+                        possibleMove={s.possibleMove}
+                        isPawnPromo={s.isPawnPromo} />
                 ))}
             </div>
+
+            {/* Koniec gry */}
             <div style={{
                 display: isGameOver.current ? 'flex' : 'none',
                 flexDirection: 'column',
